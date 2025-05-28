@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import '../models/iphones.dart';
+import 'pop_up.dart';
 
 class DetailPage extends StatelessWidget {
-  const DetailPage({super.key});
+  final Iphone iphone;
+  const DetailPage({super.key, required this.iphone});
+
 
   @override
   Widget build(BuildContext context) {
-    return const ProductDetailPage();
+    return ProductDetailPage(iphone: iphone);
   }
 }
 
 class ProductDetailPage extends StatefulWidget {
-  const ProductDetailPage({super.key});
+  final Iphone iphone;
+  const ProductDetailPage({super.key, required this.iphone});
 
   @override
   _ProductDetailPageState createState() => _ProductDetailPageState();
@@ -21,13 +27,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final price = widget.iphone.storagePrices.values.first;
+    final formattedPrice = 'Rp ${NumberFormat('#,###', 'id_ID').format(price)}';
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // App Bar
             Container(
               padding: EdgeInsets.only(
                 top: MediaQuery.of(context).padding.top + 10,
@@ -83,8 +91,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(
-                      child: Image.asset(
-                        'assets/iphone_colors.png',
+                      child: Image.network(
+                        widget.iphone.imageUrl,
                         height: 250,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) {
@@ -121,24 +129,23 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
             const SizedBox(height: 20),
 
-            // Price Section
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Rp 499.000',
-                    style: TextStyle(
+                    formattedPrice,
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.red,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
-                    'iPhone 15 pro max RAM 32GB',
-                    style: TextStyle(
+                    widget.iphone.title,
+                    style: const TextStyle(
                       fontSize: 16,
                       color: Colors.black87,
                     ),
@@ -240,13 +247,16 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           child: SizedBox(
             height: 50,
             child: ElevatedButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Order berhasil ditambahkan!'),
-                    backgroundColor: Colors.green,
-                  ),
+              onPressed: () async {
+                final result = await showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => PopUpPage(iphone: widget.iphone),
                 );
+                if (result != null) {
+
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
