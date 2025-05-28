@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../models/iphones.dart';
+import '../widgets/product_image_carousel.dart';
 
 class DetailPage extends StatelessWidget {
   final Iphone iphone;
@@ -83,59 +84,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             ),
 
             // Product Images
-            Container(
-              height: 300,
-              child: PageView(
-                children: [
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 20),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Center(
-                      child: Image.network(
-                        widget.iphone.imageUrl,
-                        height: 250,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.phone_iphone,
-                                size: 80,
-                                color: Colors.grey[400],
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                'iPhone 15 128GB\n256GB 512GB',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  _buildColorCircle(Colors.black),
-                                  _buildColorCircle(Colors.white),
-                                  _buildColorCircle(Colors.blue[100]!),
-                                  _buildColorCircle(Colors.yellow[100]!),
-                                  _buildColorCircle(Colors.pink[100]!),
-                                ],
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            ProductImageCarousel(iphone: widget.iphone),
 
             const SizedBox(height: 20),
 
