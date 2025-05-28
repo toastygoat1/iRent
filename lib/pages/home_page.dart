@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import '../widgets/product_card.dart';
 import '../widgets/main_bottom_nav.dart';
 import '../models/iphones.dart';
-import 'pop_up.dart';
 import 'package:intl/intl.dart';
+import 'detail_page.dart';
+
 
 
 class HomePage extends StatelessWidget {
@@ -54,7 +55,7 @@ class HomePage extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => PopUpPage(iphone: item),
+                  builder: (context) => DetailPage(iphone: item),
                 ),
               );
             },
