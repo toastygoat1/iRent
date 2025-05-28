@@ -14,7 +14,19 @@ class _PopUpPageState extends State<PopUpPage> {
   int _counter = 1;
   int _selectedColor = 0;
 
-  Future<void> _showBottomSheet(BuildContext context) async {
+  @override
+  void initState() {
+    super.initState();
+    // Show the bottom sheet as soon as the page is built
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final result = await _showBottomSheet(context);
+      if (mounted) {
+        Navigator.pop(context, result);
+      }
+    });
+  }
+
+  Future<Map<String, int>?> _showBottomSheet(BuildContext context) async {
     int counter = _counter;
     int selectedColor = _selectedColor;
     final storageList = widget.iphone.storagePrices.keys.toList();
@@ -27,7 +39,12 @@ class _PopUpPageState extends State<PopUpPage> {
       builder: (context) {
         return FractionallySizedBox(
           heightFactor: 0.70,
-          child: Padding(
+            child: Container(
+            decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+            child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: StatefulBuilder(
               builder: (context, setModalState) {
@@ -153,7 +170,7 @@ class _PopUpPageState extends State<PopUpPage> {
               },
             ),
           ),
-        );
+        ));
       },
     );
     if (result != null) {
@@ -162,18 +179,13 @@ class _PopUpPageState extends State<PopUpPage> {
         _selectedColor = result['selectedColor'] ?? _selectedColor;
       });
     }
+    return result;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(widget.iphone.title)),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () => _showBottomSheet(context),
-          child: const Text('Show Pop Up'),
-        ),
-      ),
+    return const Scaffold(
+      body: SizedBox.shrink(),
     );
   }
 }

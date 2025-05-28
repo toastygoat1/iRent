@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import '../models/iphones.dart';
-import 'pop_up.dart';
 
 class DetailPage extends StatelessWidget {
   final Iphone iphone;
-  const DetailPage({super.key, required this.iphone});
 
+  const DetailPage({super.key, required this.iphone});
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +16,7 @@ class DetailPage extends StatelessWidget {
 
 class ProductDetailPage extends StatefulWidget {
   final Iphone iphone;
+
   const ProductDetailPage({super.key, required this.iphone});
 
   @override
@@ -59,7 +60,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   GestureDetector(
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Fitur pesan akan segera hadir!')),
+                        const SnackBar(
+                          content: Text('Fitur pesan akan segera hadir!'),
+                        ),
                       );
                     },
                     child: Container(
@@ -99,12 +102,19 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           return Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.phone_iphone, size: 80, color: Colors.grey[400]),
+                              Icon(
+                                Icons.phone_iphone,
+                                size: 80,
+                                color: Colors.grey[400],
+                              ),
                               const SizedBox(height: 10),
                               Text(
                                 'iPhone 15 128GB\n256GB 512GB',
                                 textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey[600],
+                                ),
                               ),
                               const SizedBox(height: 10),
                               Row(
@@ -145,10 +155,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   const SizedBox(height: 8),
                   Text(
                     widget.iphone.title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.black87,
-                    ),
+                    style: const TextStyle(fontSize: 16, color: Colors.black87),
                   ),
                 ],
               ),
@@ -175,7 +182,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   _buildDetailRow('Status Sinyal', 'Sinyal Aktif'),
                   _buildDetailRow('Tahun Rilis', '2023'),
                   _buildDetailRow('Tipe Garansi', 'Garansi Distributor'),
-                  _buildDetailRow('Etalase', 'New FS', valueColor: Colors.green),
+                  _buildDetailRow(
+                    'Etalase',
+                    'New FS',
+                    valueColor: Colors.green,
+                  ),
 
                   const SizedBox(height: 30),
 
@@ -248,14 +259,195 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             height: 50,
             child: ElevatedButton(
               onPressed: () async {
-                final result = await showModalBottomSheet(
+                final storageList = widget.iphone.storagePrices.keys.toList();
+                int counter = 1;
+                int selectedColor = 0;
+                final result = await showModalBottomSheet<Map<String, int>>(
                   context: context,
                   isScrollControlled: true,
                   backgroundColor: Colors.transparent,
-                  builder: (context) => PopUpPage(iphone: widget.iphone),
+                  builder: (context) {
+                    return FractionallySizedBox(
+                      heightFactor: 0.70,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(16),
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: StatefulBuilder(
+                            builder: (context, setModalState) {
+                              final selectedStorage =
+                                  storageList[selectedColor];
+                              final price =
+                                  widget.iphone.storagePrices[selectedStorage];
+                              final formattedPrice =
+                                  'Rp ${NumberFormat('#,###', 'id_ID').format(price)}';
+                              return WillPopScope(
+                                onWillPop: () async {
+                                  Navigator.pop(context, {
+                                    'counter': counter,
+                                    'selectedColor': selectedColor,
+                                  });
+                                  return false;
+                                },
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Center(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                            child: Image.network(
+                                              widget.iphone.imageUrl,
+                                              width: 256,
+                                              height: 256,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 12),
+                                          Text(
+                                            formattedPrice,
+                                            style: const TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 24),
+                                    const Text(
+                                      'Ukuran Penyimpanan:',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      children: List.generate(
+                                        storageList.length,
+                                        (index) {
+                                          final isSelected =
+                                              selectedColor == index;
+                                          return Padding(
+                                            padding: const EdgeInsets.only(
+                                              right: 8.0,
+                                            ),
+                                            child: ChoiceChip(
+                                              label: Text(storageList[index]),
+                                              selected: isSelected,
+                                              onSelected: (_) {
+                                                setModalState(() {
+                                                  selectedColor = index;
+                                                });
+                                              },
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(height: 24),
+                                    const Text(
+                                      'Durasi Sewa (Hari):',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      children: [
+                                        IconButton(
+                                          icon: const Icon(Icons.remove),
+                                          onPressed: counter > 1
+                                              ? () => setModalState(
+                                                  () => counter--,
+                                                )
+                                              : null,
+                                        ),
+                                        Text(
+                                          '$counter',
+                                          style: const TextStyle(fontSize: 18),
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.add),
+                                          onPressed: () =>
+                                              setModalState(() => counter++),
+                                        ),
+                                      ],
+                                    ),
+                                    const Spacer(),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context, {
+                                              'counter': counter,
+                                              'selectedColor': selectedColor,
+                                            });
+                                          },
+                                          child: const Text('Cancel'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () async {
+                                            final confirm = await showDialog<bool>(
+                                              context: context,
+                                              builder: (context) => AlertDialog(
+                                                title: const Text('Konfirmasi'),
+                                                content: const Text(
+                                                  'Apakah Anda yakin dengan pilihan ini?',
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () =>
+                                                        Navigator.pop(
+                                                          context,
+                                                          false,
+                                                        ),
+                                                    child: const Text('Tidak'),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () =>
+                                                        Navigator.pop(
+                                                          context,
+                                                          true,
+                                                        ),
+                                                    child: const Text('Ya'),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                            if (confirm == true) {
+                                              Navigator.pop(context, {
+                                                'counter': counter,
+                                                'selectedColor': selectedColor,
+                                              });
+                                            }
+                                          },
+                                          child: const Text('OK'),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 );
                 if (result != null) {
-
+                  // Handle result
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -268,10 +460,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               ),
               child: const Text(
                 'ORDER',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -288,10 +477,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       decoration: BoxDecoration(
         color: color,
         shape: BoxShape.circle,
-        border: Border.all(
-          color: Colors.grey[300]!,
-          width: 1,
-        ),
+        border: Border.all(color: Colors.grey[300]!, width: 1),
       ),
     );
   }
@@ -315,7 +501,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               style: TextStyle(
                 fontSize: 14,
                 color: valueColor ?? Colors.black87,
-                fontWeight: valueColor != null ? FontWeight.w500 : FontWeight.normal,
+                fontWeight: valueColor != null
+                    ? FontWeight.w500
+                    : FontWeight.normal,
               ),
             ),
           ),
